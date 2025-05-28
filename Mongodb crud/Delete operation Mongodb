@@ -1,0 +1,36 @@
+use clinicDB;
+
+db.createCollection('patients');
+
+db.patients.insertOne({ name: "Sam", age: 30 });
+db.patients.insertMany([
+  { name: "Tina", age: 40 },
+  { name: "Raj", age: 35 }
+]);
+
+db.patients.find();
+
+db.patients.updateOne(
+  { name: "Sam" },
+  { $set: { age: 31 } }
+);
+
+db.patients.updateMany(
+  { age: { $gte: 35 } },
+  { $inc: { age: 2 } }
+);
+
+db.patients.updateOne(
+  { name: "Tina" },
+  { $set: { condition: "recovering" } }
+);
+
+db.patients.updateOne(
+  { name: "Raj" },
+  { $unset: { age: "" } }
+);
+
+db.patients.deleteOne({ name: "Sam" });
+db.patients.deleteMany({ age: { $gt: 40 } });
+
+db.patients.find();

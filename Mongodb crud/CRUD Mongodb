@@ -1,0 +1,52 @@
+use hospitalDB
+
+db.createCollection('patients');
+
+db.patients.insertOne({
+    name:"Brindha",
+    age:23
+})
+db.patients.insertOne({
+    name:"Nive",age:25
+})
+
+db.patients.insertMany([
+  { name: "Anu", age: 45 },
+  { name: "Bala", age: 50 }
+]);
+
+db.patients.find();
+db.patients.find().pretty();
+//it shows only the name
+db.patients.find({}, { name: 1, _id: 0 }); 
+
+
+
+db.patients.updateOne(
+  { name: "Anu" },
+  { $set: { age: 29 } }
+);
+
+db.patients.updateOne(
+  { name: "Nive" },
+  { $set: { name: "Nivedita", age: 26 } }
+);
+
+db.patients.updateMany(
+  { age: { $gt: 23 } },
+  { $inc: { age: 1 } }
+);
+
+db.patients.updateOne(
+  { name: "Brindha" },
+  { $set: { condition: "healthy" } }
+);
+
+db.patients.find({});
+db.patients.updateOne(
+  { name: "Bala" },
+  { $unset: { age: "" } }
+);
+
+db.patients.find()
+
