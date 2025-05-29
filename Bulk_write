@@ -1,0 +1,25 @@
+use hospitalDB;
+
+db.createCollection("patients")
+
+db.patients.bulkWrite([
+   { insertOne: { document: { name: "Brindha", age: 23 } } },
+   { insertOne: { document: { name: "Nive", age: 25 } } },
+   { insertOne: { document: { name: "Anu", age: 45 } } },
+   { insertOne: { document: { name: "Bala", age: 50 } } },
+
+   { updateOne: { filter: { name: "Anu" }, update: { $set: { age: 29 } } } },
+   { updateOne: { filter: { name: "Nive" }, update: { $set: { name: "Nivedita", age: 26 } } } },
+   { updateMany: { filter: { age: { $gt: 23 } }, update: { $inc: { age: 1 } } } },
+   { updateOne: { filter: { name: "Brindha" }, update: { $set: { condition: "healthy" } } } },
+
+   { deleteOne: { filter: { name: "Bala" } } },
+
+   
+   { replaceOne: { 
+       filter: { name: "Anu" }, 
+       replacement: { name: "Anuja", age: 31, gender: "female" } 
+   }}
+])
+
+db.patients.find().pretty()
