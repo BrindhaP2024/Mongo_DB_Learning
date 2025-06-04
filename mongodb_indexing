@@ -1,0 +1,56 @@
+use companyDB
+db.createCollection("employees")
+
+
+db.employees.insertMany([
+  { name: "Arun", department: "HR", salary: 50000, email: "alice@example.com", description: "HR executive with recruitment experience" },
+  { name: "Arjun", department: "Engineering", salary: 75000, email: "bob@example.com", description: "Software engineer working on backend systems" },
+  { name: "Anirudh", department: "Engineering", salary: 80000, email: "charlie@example.com", description: "Senior engineer and team lead" },
+  { name: "Sam", department: "Sales", salary: 60000, email: "diana@example.com", description: "Sales executive with client management experience" },
+  { name: "Edwin", department: "HR", salary: 52000, email: "eve@example.com", description: "HR manager with payroll expertise" }
+])
+
+db.employees.createIndex({ name: 1 });
+
+db.employees.createIndex({ description: "text", name: "text" });
+
+db.employees.find({ $text: { $search: "engineer" } });
+
+db.employees.find(
+  { $text: { $search: "HR manager" } },
+  { score: { $meta: "textScore" } }
+).sort({ score: { $meta: "textScore" } })
+
+db.employees.aggregate([
+  { $group: { _id: "$department", totalSalary: { $sum: "$salary" }, employeeCount: { $sum: 1 } } },
+  { $sort: { totalSalary: -1 } }
+])
+
+
+db.employees.aggregate([
+  { $match: { department: "Engineering" } },
+  { $project: { name: 1, salary: 1 } }
+])
+
+const mapFn = function () {
+  emit(this.department, this.salary);
+};
+
+const reduceFn = function (key, values) {
+  return Array.sum(values);
+};
+
+db.employees.mapReduce(
+  mapFn,
+  reduceFn,
+  {
+    out: "salary_totals_by_dept"
+  }
+);
+
+
+
+db.salary_totals_by_dept.find().pretty()
+
+
+
