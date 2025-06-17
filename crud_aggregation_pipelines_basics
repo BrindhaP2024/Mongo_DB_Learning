@@ -1,0 +1,216 @@
+use mongodb_recall;
+
+db.emp_details.insertOne({
+  name: "Brindha",
+  designation: "Trainee",
+  company: "Aspire",
+  c_id: 123
+});
+
+db.emp_details.insertOne({
+  name: "Nive",
+  designation: "Engineer",
+  company: "Aspire",
+  c_id: 212
+});
+
+db.emp_details.insertOne({
+  name: "Raj",
+  designation: "Tech-lead",
+  company: "TCS",
+  c_id: 232
+});
+
+db.emp_details.insertOne({
+  name: "Rajesh",
+  designation: "Manager",
+  company: "TCS",
+  c_id: 277
+});
+
+db.emp_details.insertOne({
+  name: "hari",
+  designation: "Senior analyst",
+  company: "Wipro",
+  c_id: 37,
+  shiftType: "Night"
+});
+
+db.emp_details.insertOne({
+  name: "Arjun",
+  designation: "Analyst",
+  company: "Wipro",
+  c_id: 71,
+  shift: {
+    type: "Morning",
+    time: "8am to 6am"
+  }
+});
+
+db.emp_details.insertOne({
+  name: "Ravi",
+  designation: "Developer",
+  company: "TCS",
+  c_id: 101,
+  shift: {
+    type: "Night",
+    time: "9pm to 5am"
+  },
+  attendance: [
+    { date: "2024-06-10", status: "Present" },
+    { date: "2024-06-11", status: "Present" }
+  ]
+});
+
+db.emp_details.insertOne({
+  name: "Asha",
+  designation: "Tester",
+  company: "Wipro",
+  c_id: 102,
+  shift: {
+    type: "Morning",
+    time: "10am to 6pm"
+  },
+  attendance: [
+    { date: "2024-06-12", status: "Present" }
+  ]
+});
+
+db.emp_details.insertMany([
+ {
+    name: "Aarav",
+    designation: "Testing",
+    company: "Wipro",
+    c_id: 2390,
+    shift: {
+      type: "Morning",
+      time: "9am to 5am"
+    },
+    attendance: [
+      { date: "2025-06-14", status: "Present" }
+    ]
+  },
+  {
+    name: "Kumar",
+    designation: "Project Manager",
+    company: "Capgemini",
+    c_id: 2389,
+    shift: {
+      type: "Evening",
+      time: "5pm to 10pm"
+    },
+    attendance: [
+      { date: "2025-06-14", status: "Absent" }
+    ]
+  },
+  {
+    name: "Swetha",
+    designation: "Data Analyst",
+    company: "Capgemini",
+    c_id: 2389,
+    shift: {
+      type: "Morning",
+      time: "10am to 4pm"
+    }
+  }
+])
+
+db.emp_details.deleteOne({name:"Rajesh"});
+
+db.emp_details.find({});
+
+db.emp_details.deleteMany({ company: "Wipro" });
+
+db.emp_details.find({});
+
+
+//upsert
+
+db.emp_details.updateOne(
+{name:"Brindha"},
+{$set:{designation:"Engineer",company:"Accenture"}},
+    {upsert: true}    
+);
+
+
+db.emp_details.updateMany(
+  { company: "Google" },
+  { $set: { shift: { type: "Day", time: "9am to 5pm" } } },
+  { upsert: true }
+);
+
+db.emp_details.find();
+
+db.emp_details.findAndModify({
+  query: { name: "Deepa" },
+  update: { $set: { company: "IBM" } },
+  upsert: true,
+  new: true
+});
+
+db.emp_details.findOneAndUpdate(
+  { name: "Arun" },
+  { $set: { designation: "Tester", company: "Infosys" } },
+  { upsert: true, returnDocument: "after" } 
+);
+
+db.emp_details.bulkWrite([
+  { insertOne: { document: { name: "Kiran", company: "TCS" } } },
+  { updateOne: {
+      filter: { name: "Kiran" },
+      update: { $set: { role: "Engineer" } },
+      upsert: true
+    }
+  },
+  { deleteOne: { filter: { name: "Asha" } } },
+  { replaceOne: {
+      filter: { name: "Meena" },
+      replacement: { name: "Meena", company: "Zoho", role: "Designer" },
+      upsert: true
+    }
+  }
+],
+{ ordered: true }
+);
+
+
+db.emp_details.createIndex({ name: 1 });
+db.emp_details.createIndex({ company: 1, designation: 1 });
+db.emp_details.find({ company: "TCS", designation: "Developer" });
+db.emp_details.createIndex({ "attendance.date": 1 });
+db.emp_details.find({ "attendance.date": "2025-06-14" });
+
+//text index
+
+db.emp_details.createIndex({ name: "text", designation: "text" });
+
+db.emp_details.find({ $text: { $search: "Analyst" } });
+
+db.emp_details.getIndexes();
+//db.emp_details.dropIndex("name_1");
+
+
+db.emp_details.insertOne({
+  name: "Ravi",
+  location: {
+    type: "Point",
+    coordinates: [78.4867, 17.3850] 
+  }
+});
+
+db.emp_details.aggregate([
+  {
+    $group: {
+      _id: { name: "$name", designation: "$designation", company: "$company", c_id: "$c_id" },
+      count: { $sum: 1 }
+    }
+  },
+  { $match: { count: { $gt: 1 } } }
+]);
+//creating the unique index
+db.emp_details.createIndex(
+  { name: 1, designation: 1, company: 1, c_id: 1 },
+  { unique: true }
+);
+
+
