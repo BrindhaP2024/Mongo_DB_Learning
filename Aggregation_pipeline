@@ -1,0 +1,71 @@
+use hospitalDB;
+
+db.patients.aggregate([
+  {
+    $match: {
+      age: { $lte:25 }
+    }
+  }
+])
+
+
+db.patients.aggregate([
+  {
+    $match: {
+      age: { $gte:25 }
+    }
+  }
+])
+
+
+db.patients.aggregate([
+  {
+    $group: {
+      _id: null,
+      averageAge: { $avg: "$age" }
+    }
+  }
+])
+
+db.patients.aggregate([
+  {
+    $match: { age: { $gt: 25 } }
+  },
+  {
+    $count: "PatientsAbove25"
+  }
+])
+
+db.patients.aggregate([
+  { $project: { name: 1, age: 1, _id: 0 } }
+])
+
+db.patients.aggregate([
+  { $group: { _id: "$condition", totalPatients: { $sum: 1 } } }
+])
+db.patients.aggregate([
+  { $sort: { age: -1 } }
+])
+
+db.patients.aggregate([
+  { $sort: { age: -1 } },
+  { $limit: 2 }
+])
+
+
+db.patients.aggregate([
+  { $sort: { age: -1 } },
+  { $skip: 1 }
+])
+
+
+db.patients.aggregate([
+  { $addFields: { status: "active" } }
+])
+
+db.patients.aggregate([
+  { $match: { age: { $gt: 25 } } },
+  { $project: { name: 1, age: 1, _id: 0 } },
+  { $merge: "filteredPatients" }
+])
+
